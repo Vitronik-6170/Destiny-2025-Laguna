@@ -9,18 +9,18 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AdjustArmDown;
 import frc.robot.commands.AdjustArmUp;
-import frc.robot.commands.AdjustLifterDown;
-import frc.robot.commands.AdjustLifterUp;
+import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DesHanging;
+import frc.robot.commands.ElevatorCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.Floor;
-import frc.robot.commands.Hang;
 import frc.robot.commands.Hanging;
 import frc.robot.commands.Human;
-import frc.robot.commands.PrepareToHang;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ReefDown;
 import frc.robot.commands.ReefUp;
 import frc.robot.commands.ReleaseArm;
+import frc.robot.commands.WristCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Cage;
 import frc.robot.subsystems.ExampleSubsystem;
@@ -40,7 +40,11 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -104,8 +108,6 @@ public class RobotContainer {
     m_mechanismsController.x().whileTrue(new Human(m_Arm, m_Lift, m_Wrist));
     m_mechanismsController.pov(0).whileTrue(new AdjustArmUp(m_Arm));
     m_mechanismsController.pov(180).whileTrue(new AdjustArmDown(m_Arm));
-    //m_mechanismsController.pov(270).whileTrue(new AdjustLifterDown(m_Lift));
-    //m_mechanismsController.pov(90).whileTrue(new AdjustLifterUp(m_Lift));
     m_mechanismsController.b().whileTrue(new Hanging(m_Cage));
     m_mechanismsController.y().whileTrue(new DesHanging(m_Cage));
     m_mechanismsController.leftStick().whileTrue(new ReleaseArm(m_Lift));
@@ -125,21 +127,44 @@ public class RobotContainer {
         .setKinematics(DriveConstants.kDriveKinematics);
 
     // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+    Trajectory swerveToL1 = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        List.of(),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(0, 0, new Rotation2d(0)),
+        new Pose2d(2, 0, new Rotation2d(0)),
         config);
+
+    Trajectory swerveToHuman = TrajectoryGenerator.generateTrajectory(
+      // Start at the origin facing the +X direction
+      new Pose2d(2, 0, new Rotation2d(0)),
+      // Pass through these two interior waypoints, making an 's' curve path
+      //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+      List.of(new Translation2d(0.5, 0)),
+      // End 3 meters straight ahead of where we started, facing forward
+      new Pose2d(3, -2.5, new Rotation2d(0)),
+      config);
 
     var thetaController = new ProfiledPIDController(
         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
+    SwerveControllerCommand swerveToL1Command = new SwerveControllerCommand(
+        swerveToL1,
+        m_SwerveDrive::getPose, // Functional interface to feed supplier
+        DriveConstants.kDriveKinematics,
+
+        // Position controllers
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        thetaController,
+        m_SwerveDrive::setModuleStates,
+        m_SwerveDrive);
+    
+      SwerveControllerCommand swerveToHumanCommand = new SwerveControllerCommand(
+        swerveToHuman,
         m_SwerveDrive::getPose, // Functional interface to feed supplier
         DriveConstants.kDriveKinematics,
 
@@ -151,9 +176,29 @@ public class RobotContainer {
         m_SwerveDrive);
 
     // Reset odometry to the starting pose of the trajectory.
-    m_SwerveDrive.resetOdometry(exampleTrajectory.getInitialPose());
+    m_SwerveDrive.resetOdometry(swerveToL1.getInitialPose());
+
+    Command elevatorUp = new ElevatorCommand(m_Lift, Constants.LiftConstants.kRIGHTLiftTop, Constants.LiftConstants.kLEFTLiftTop);
+    Command armCommand = new ArmCommand(m_Arm, Constants.ArmConstants.kArmReef_L1);
+    Command elevatorDown = new ElevatorCommand(m_Lift, Constants.LiftConstants.kLiftFloor, Constants.LiftConstants.kLiftFloor);
+    Command shootCoral = new IntakeCommand(m_Intake, -0.2, 3);
+    Command horizontalWrist = new WristCommand(m_Wrist, Constants.WristConstants.kWristReeft_L1);
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_SwerveDrive.drive(0, 0, 0, false));
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        swerveToL1Command,
+        new SequentialCommandGroup(
+          elevatorUp,
+          armCommand,
+          horizontalWrist,
+          elevatorDown
+        )
+      ),
+      shootCoral,
+      swerveToHumanCommand,
+      new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
+    );
+    //return swerveControllerCommand.andThen(() -> m_SwerveDrive.drive(0, 0, 0, false));
   }
 }

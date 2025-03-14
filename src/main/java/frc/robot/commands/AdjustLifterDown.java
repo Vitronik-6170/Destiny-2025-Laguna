@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Lift;
 import edu.wpi.first.wpilibj2.command.Command;
 

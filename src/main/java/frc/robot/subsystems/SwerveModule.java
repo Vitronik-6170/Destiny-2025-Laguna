@@ -16,6 +16,10 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.RelativeEncoder;
 
 import frc.robot.Configs;
@@ -26,6 +30,9 @@ public class SwerveModule {
 
   private final RelativeEncoder m_drivingEncoder;
   private final RelativeEncoder m_turningEncoder;
+
+  private final CANcoderConfiguration m_coderConfig;
+  private final CANcoder m_absEcoder;
 
   private final SparkClosedLoopController m_drivingClosedLoopController;
   private final SparkClosedLoopController m_turningClosedLoopController;
@@ -39,7 +46,7 @@ public class SwerveModule {
    * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
    * Encoder.
    */
-  public SwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+  public SwerveModule(int drivingCANId, int turningCANId, int encoderId, double encoderOffset) {
     m_drivingSpark = new SparkMax(drivingCANId, MotorType.kBrushless);
     m_turningSpark = new SparkMax(turningCANId, MotorType.kBrushless);
 
@@ -57,7 +64,19 @@ public class SwerveModule {
     m_turningSpark.configure(Configs.MAXSwerveModule.turningConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    m_chassisAngularOffset = chassisAngularOffset;
+    m_coderConfig = new CANcoderConfiguration();
+    m_coderConfig.MagnetSensor = new MagnetSensorConfigs();
+    m_coderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    m_coderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+    m_coderConfig.MagnetSensor.MagnetOffset = encoderOffset;
+
+    m_absEcoder = new CANcoder(encoderId);
+    m_absEcoder.getConfigurator().apply(m_coderConfig);
+
+    double encoderRadians = m_absEcoder.getAbsolutePosition().getValueAsDouble()*2*Math.PI;
+    m_chassisAngularOffset = getRelativeEncoderTurningPosition()-encoderRadians;
+    //m_chassisAngularOffset = 0;
+
     m_desiredState.angle = new Rotation2d(getRelativeEncoderTurningPosition());
     m_drivingEncoder.setPosition(0);
   }
@@ -118,10 +137,20 @@ public class SwerveModule {
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
   }
-  public double getRelativeEncoderTurningPosition() {
+  public void desiredDistance(double distance){
+    double ticks = 6.8833, diameter = 0.1016;
+    m_drivingClosedLoopController.setReference((distance*ticks)/(Math.PI*diameter), ControlType.kPosition);
+  }
 
+  public void resetToAbsolute(double ticks){
+    double offset = m_absEcoder.getAbsolutePosition().getValueAsDouble()*ticks;
+    m_turningClosedLoopController.setReference(offset, ControlType.kPosition);
+    m_turningEncoder.setPosition(0);
+  }
+
+
+  public double getRelativeEncoderTurningPosition() {
     double valorNormalizado = m_turningEncoder.getPosition() % 21;
-  
     return (valorNormalizado*2*Math.PI)/21;
   }
   public void setCoast(){

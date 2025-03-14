@@ -66,7 +66,7 @@ public class Arm extends SubsystemBase {
 
   public void adjustArmUp(){
     double position = getArmPosition();
-    armController.setReference(position+0.349066, ControlType.kPosition);
+    armController.setReference(position+0.549066, ControlType.kPosition);
   }
   public void adjustArmDown(){
     double position = getArmPosition();
@@ -76,6 +76,9 @@ public class Arm extends SubsystemBase {
   private void setPosition() {
     double position = POSITIONS[positionIndex];
     armController.setReference(position, ControlType.kPosition);
+  }
+  public void setPosition(double targetPosition){
+    armController.setReference(targetPosition, ControlType.kPosition);
   }
 
   public void grabFromFloor(){

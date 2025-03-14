@@ -22,32 +22,6 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kMechanismsControllerPort = 1;
   }
-  public static class DriveConstants2 {
-    public static final int kFrontLeftDriveID = 8;
-    public static final int kFrontRightDriveID = 6;
-    public static final int kRearLeftDriveID = 4;
-    public static final int kRearRightDriveID = 2;
-
-    public static final int kFrontLeftAngleID = 9;
-    public static final int kFrontRightAngleID = 7;
-    public static final int kRearLeftAngleID = 5;
-    public static final int kRearRightAngleID = 3;
-   
-    public static final int kFrontLeftEncoderID = 1;
-    public static final int kFrontRightEncoderID = 2;
-    public static final int kRearLeftEncoderID = 3;
-    public static final int kRearRightEncoderID = 4;
-
-    public static final double kOffsetFrontLeft = -0.35205078125;
-    public static final double kOffsetFrontRight = -0.30126953125;
-    public static final double kOffsetRearLeft = -0.419189453125;
-    public static final double kOffsetRearRight = 0.438720703125;
-
-    public static final double kTicksFrontLeft = 21;
-    public static final double kTicksFrontRight = 21;
-    public static final double kTicksRearLeft = 21;
-    public static final double kTicksRearRight = 21;
-  }
   public static class LiftConstants {
     public static final int kLeftLiftMotorID = 11;
     public static final int kRightLiftMotorID = 10;
@@ -73,7 +47,7 @@ public final class Constants {
   }
   public static class WristConstants {
     public static final int kWristMotorID = 16;
-    public static final double kWristEncoderOffset = 0;
+    public static final double kWristEncoderOffset = 0.9745841;
     public static final double kWristPower = 0.3;
 
     public static final double verticalWrist = Math.PI;
@@ -120,7 +94,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 2;
+    public static final double kMaxSpeedMetersPerSecond = 3.5;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     // Chassis configuration
@@ -134,12 +108,6 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = 0;//-Math.PI / 2;
-    public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = 0;//Math.PI;
-    public static final double kBackRightChassisAngularOffset = 0;//Math.PI / 2;
-
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 8;
     public static final int kRearLeftDrivingCanId = 4;
@@ -150,6 +118,18 @@ public final class Constants {
     public static final int kRearLeftTurningCanId = 5;
     public static final int kFrontRightTurningCanId = 7;
     public static final int kRearRightTurningCanId = 3;
+
+    // CANCODER IDs
+    public static final int kFrontLeftEncoderID = 1;
+    public static final int kFrontRightEncoderID = 2;
+    public static final int kRearLeftEncoderID = 3;
+    public static final int kRearRightEncoderID = 4;
+
+    // CANCODER OFFSETS
+    public static final double kOffsetFrontLeft = -0.35205078125;
+    public static final double kOffsetFrontRight = -0.30126953125;
+    public static final double kOffsetRearLeft = -0.419189453125;
+    public static final double kOffsetRearRight = 0.438720703125;
 
     public static final boolean kGyroReversed = true;
   }

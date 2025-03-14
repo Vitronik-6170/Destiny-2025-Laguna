@@ -82,6 +82,10 @@ public class Lift extends SubsystemBase {
     left_liftController.setReference(leftLevel, ControlType.kPosition);
     right_liftController.setReference(rightLevel, ControlType.kPosition);
   }
+  public void setLevel(double targetLevel_R, double targetLevel_L) {
+    right_liftController.setReference(targetLevel_R, ControlType.kPosition);
+    left_liftController.setReference(targetLevel_L, ControlType.kPosition);
+  }
 
   public void goToFloor() {
     double level = Constants.LiftConstants.kLiftFloor;

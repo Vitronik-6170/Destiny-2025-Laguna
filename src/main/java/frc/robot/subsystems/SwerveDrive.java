@@ -27,30 +27,35 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule m_frontLeft = new SwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
-      DriveConstants.kFrontLeftChassisAngularOffset);
+      DriveConstants.kFrontLeftEncoderID,
+      DriveConstants.kOffsetFrontLeft);
 
   private final SwerveModule m_frontRight = new SwerveModule(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightChassisAngularOffset);
+      DriveConstants.kFrontRightEncoderID,
+      DriveConstants.kOffsetFrontRight);
 
   private final SwerveModule m_rearLeft = new SwerveModule(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kBackLeftChassisAngularOffset);
+      DriveConstants.kRearLeftEncoderID,
+      DriveConstants.kOffsetRearLeft);
 
   private final SwerveModule m_rearRight = new SwerveModule(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kBackRightChassisAngularOffset);
+      DriveConstants.kRearRightEncoderID,
+      DriveConstants.kOffsetRearRight);
 
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
+  private double Navx;
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(-m_gyro.getAngle()),
+      Rotation2d.fromDegrees(Navx),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -67,8 +72,9 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
+    Navx = (-m_gyro.getAngle())+180;
     m_odometry.update(
-        Rotation2d.fromDegrees(-m_gyro.getAngle()),
+        Rotation2d.fromDegrees(Navx),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -93,7 +99,7 @@ public class SwerveDrive extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(-m_gyro.getAngle()),
+        Rotation2d.fromDegrees(Navx),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -121,7 +127,7 @@ public class SwerveDrive extends SubsystemBase {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(-m_gyro.getAngle()))
+                Rotation2d.fromDegrees(Navx))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -134,7 +140,7 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber("Encoder frontRight", m_frontRight.getEncoder());
     SmartDashboard.putNumber("Encoder rearLeft", m_rearLeft.getEncoder());
     SmartDashboard.putNumber("Encoder rearRight", m_rearRight.getEncoder());
-    SmartDashboard.putNumber("NAVX", m_gyro.getAngle());
+    SmartDashboard.putNumber("NAVX", Navx);
   }
 
   /**
@@ -191,6 +197,27 @@ public class SwerveDrive extends SubsystemBase {
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+
+  public void resetDrive(){
+    m_frontLeft.resetEncoders();
+    m_frontRight.resetEncoders();
+    m_rearLeft.resetEncoders();
+    m_rearRight.resetEncoders();
+  }
+  public void driveOdometri(double distance){
+    m_frontLeft.desiredDistance(distance);
+    m_frontRight.desiredDistance(distance);
+    m_rearLeft.desiredDistance(distance);
+    m_rearRight.desiredDistance(distance);
+  }
+  public void noPTR(){
+    m_frontLeft.resetToAbsolute(21);
+    m_frontRight.resetToAbsolute(21);
+    m_rearLeft.resetToAbsolute(21);
+    m_rearRight.resetToAbsolute(21);
+  }
+
+
   public void setCoast(){
     m_frontLeft.setCoast();
     m_frontRight.setCoast();

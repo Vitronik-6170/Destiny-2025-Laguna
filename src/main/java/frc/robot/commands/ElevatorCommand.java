@@ -8,17 +8,21 @@ import frc.robot.subsystems.Lift;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class AdjustLifterUp extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+public class ElevatorCommand extends Command {
+  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField", "unused"})
   private final Lift m_Lift;
+  private final double targetLevel_R;
+  private final double targetLevel_L;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AdjustLifterUp(Lift m_Lift) {
+  public ElevatorCommand(Lift m_Lift, double targetLevel_R, double targetLevel_L) {
     this.m_Lift = m_Lift;
+    this.targetLevel_R = targetLevel_R;
+    this.targetLevel_L = targetLevel_L;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_Lift);
   }
@@ -26,23 +30,24 @@ public class AdjustLifterUp extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_Lift.setLevel(targetLevel_R, targetLevel_L);
   }
-
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    m_Lift.adjustLifterUp();
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_Lift.stop();
+    if (interrupted) {
+      m_Lift.stop();      
+    }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return Math.abs(m_Lift.getAbsoluteEncoderL()-targetLevel_L) < 1 || 
+            Math.abs(m_Lift.getAbsoluteEncoderR()-targetLevel_R) < 1;
   }
 }

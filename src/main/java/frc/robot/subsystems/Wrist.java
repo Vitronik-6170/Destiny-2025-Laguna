@@ -67,6 +67,12 @@ public class Wrist extends SubsystemBase {
     double position = POSITIONS[positionWrist];
     wristController.setReference(position, ControlType.kPosition);
   }
+  public void setPosition(double position) {
+    wristController.setReference(position, ControlType.kPosition);
+  }
+  public void stopWrist() {
+    wristController.setReference(getAbsoluteEncoder(), ControlType.kPosition);
+  }
 
   public void verticalWrist() {
     wristController.setReference(Constants.WristConstants.verticalWrist, ControlType.kPosition);
@@ -78,8 +84,8 @@ public class Wrist extends SubsystemBase {
     wristController.setReference(Constants.WristConstants.FloorWrist, ControlType.kPosition);
   }
 
-  public void getAbsoluteEncoder() {
-    wristEncoder.getPosition();
+  public double getAbsoluteEncoder() {
+    return wristEncoder.getPosition();
   }
 
   /**
