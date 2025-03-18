@@ -41,10 +41,8 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -118,7 +116,7 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousCommand(String selection) {
     // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
@@ -134,17 +132,17 @@ public class RobotContainer {
         //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
         List.of(),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(2, 0, new Rotation2d(0)),
+        new Pose2d(2.2, 0, new Rotation2d(0)),
         config);
 
     Trajectory swerveToHuman = TrajectoryGenerator.generateTrajectory(
       // Start at the origin facing the +X direction
-      new Pose2d(2, 0, new Rotation2d(0)),
+      new Pose2d(2.2, 0, new Rotation2d(0)),
       // Pass through these two interior waypoints, making an 's' curve path
       //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-      List.of(new Translation2d(0.5, 0)),
+      List.of(new Translation2d(1.5, -0.5)),
       // End 3 meters straight ahead of where we started, facing forward
-      new Pose2d(3, -2.5, new Rotation2d(0)),
+      new Pose2d(4.5, -2, new Rotation2d(0)),
       config);
 
     var thetaController = new ProfiledPIDController(
@@ -179,26 +177,68 @@ public class RobotContainer {
     m_SwerveDrive.resetOdometry(swerveToL1.getInitialPose());
 
     Command elevatorUp = new ElevatorCommand(m_Lift, Constants.LiftConstants.kRIGHTLiftTop, Constants.LiftConstants.kLEFTLiftTop);
-    Command armCommand = new ArmCommand(m_Arm, Constants.ArmConstants.kArmReef_L1);
+    Command armL1 = new ArmCommand(m_Arm, Constants.ArmConstants.kArmReef_L1);
     Command elevatorDown = new ElevatorCommand(m_Lift, Constants.LiftConstants.kLiftFloor, Constants.LiftConstants.kLiftFloor);
-    Command shootCoral = new IntakeCommand(m_Intake, -0.2, 3);
-    Command horizontalWrist = new WristCommand(m_Wrist, Constants.WristConstants.kWristReeft_L1);
+    Command shootCoral = new IntakeCommand(m_Intake, -0.2, 1.5);
+    Command wristL1 = new WristCommand(m_Wrist, Constants.WristConstants.kWristReeft_L1);
+    Command armHuman = new ArmCommand(m_Arm, Constants.ArmConstants.kArmHuman);
+    Command wristHuman = new WristCommand(m_Wrist, Constants.WristConstants.horizontalWrist);
 
     // Run path following command, then stop at the end.
-    return new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        swerveToL1Command,
-        new SequentialCommandGroup(
-          elevatorUp,
-          armCommand,
-          horizontalWrist,
-          elevatorDown
-        )
-      ),
+    if(selection.equals("A")){
+      return new SequentialCommandGroup(
+      elevatorUp,
+      armL1,
+      wristL1,
+      elevatorDown,
+      swerveToL1Command,
       shootCoral,
+      armHuman,
+      wristHuman,
       swerveToHumanCommand,
       new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
     );
-    //return swerveControllerCommand.andThen(() -> m_SwerveDrive.drive(0, 0, 0, false));
+    }else if(selection.equals("B")){
+      return new SequentialCommandGroup(
+      elevatorUp,
+      armL1,
+      wristL1,
+      elevatorDown,
+      swerveToL1Command,
+      shootCoral,
+      armHuman,
+      wristHuman,
+      new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
+    );
+    }else if(selection.equals("C")){
+      return new SequentialCommandGroup(
+      elevatorUp,
+      armL1,
+      wristL1,
+      elevatorDown,
+      swerveToL1Command,
+      new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
+    );
+    }
+    return new SequentialCommandGroup(
+      elevatorUp,
+      armL1,
+      wristL1,
+      elevatorDown,
+      swerveToL1Command,
+      shootCoral,
+      armHuman,
+      wristHuman,
+      new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
+    );
+    // new ParallelCommandGroup(
+      //   new SequentialCommandGroup(
+      //     elevatorUp,
+      //     armCommand,
+      //     wristL1,
+      //     elevatorDown
+      //   ),
+      //   swerveToL1Command
+      // ),
   }
 }

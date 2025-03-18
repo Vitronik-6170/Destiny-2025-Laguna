@@ -33,13 +33,13 @@ public final class Constants {
     public static final double kLEFTLiftReef_L2 = 0;
     public static final double kLEFTLiftReef_L3 = 74.28549194335;
     public static final double kLEFTLiftAlgae = 50.85717391967;
-    public static final double kLEFTLiftTop = 85.57318878173;
+    public static final double kLEFTLiftTop = 88.57318878173;
 
     public static final double kRIGHTLiftReef_L1 = 0;
     public static final double kRIGHTLiftReef_L2 = 0;
     public static final double kRIGHTLiftReef_L3 = 74.04737472534;
     public static final double kRIGHTLiftAlgae = 50.54761886596;
-    public static final double kRIGHTLiftTop = 85.57318878173;    
+    public static final double kRIGHTLiftTop = 88.57318878173;    
   }
   public static class IntakeConstants {
     public static final int kIntakeMotorID = 15;
@@ -51,7 +51,7 @@ public final class Constants {
     public static final double kWristPower = 0.3;
 
     public static final double verticalWrist = Math.PI;
-    public static final double horizontalWrist = 3* Math.PI/2;
+    public static final double horizontalWrist = 53* Math.PI/36;
     public static final double FloorWrist = Math.PI/2;
 
     public static final double kWristReeft_L1 = FloorWrist;
@@ -61,12 +61,12 @@ public final class Constants {
   }
   public static class ArmConstants {
     public static final int kArmMotorID = 14;
-    public static final double kArmEncoderOffset = 0.71;
+    public static final double kArmEncoderOffset = 0.05;
     public static final double kArmPower = 0.8;
 
     public static final double kArmOut = 3;
 
-    public static final double kArmFloor = 1.2;
+    public static final double kArmFloor = 1.1;
     public static final double kArmHuman = 2.238913307189941+(Math.PI/2);
 
     public static final double kArmReef_L1 = 3.589863929748-(Math.PI/2);

@@ -37,12 +37,13 @@ public class Arm extends SubsystemBase {
     armConfig.idleMode(IdleMode.kBrake);
     armConfig.inverted(true);
     armConfig.absoluteEncoder.inverted(false);
+    armConfig.closedLoopRampRate(0.5);
     armConfig.absoluteEncoder.positionConversionFactor(2*Math.PI);
     armConfig.absoluteEncoder.zeroOffset(Constants.ArmConstants.kArmEncoderOffset);
     armConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
     armConfig.closedLoop.pid(1, 0, 0);
     armConfig.closedLoop.outputRange(-Constants.ArmConstants.kArmPower, Constants.ArmConstants.kArmPower);
-    armConfig.closedLoopRampRate(0.001);
+    armConfig.closedLoopRampRate(0.1);
 
     armMotor = new SparkMax(Constants.ArmConstants.kArmMotorID, MotorType.kBrushless);
     armEncoder = armMotor.getAbsoluteEncoder();

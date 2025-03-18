@@ -50,15 +50,10 @@ public class Robot extends TimedRobot {
 
     drive = new Drive(m_robotContainer.m_SwerveDrive);
     grabGamePiece = new GrabGamePiece(m_robotContainer.m_Intake);
-    // m_chooser.addOption("Auto cage 3", "A");
-    // m_chooser.addOption("Auto cage 2", "B");
-    // m_chooser.addOption("Auto cage 1", "C");
-    // m_chooser.addOption("Auto salir", "D");
-    // m_chooser.addOption("Auto Derecha Ranking", "E");
-    // m_chooser.addOption("Auto Izquierda Ranking", "F");
-    // m_chooser.addOption("Auto Centro", "G");
-    // m_chooser.addOption("Auto Izq", "H");
-    // SmartDashboard.putData(m_chooser);
+    m_chooser.addOption("L1 y Human", "A");
+    m_chooser.addOption("L1", "B");
+    m_chooser.addOption("Salir", "C");
+    SmartDashboard.putData(m_chooser);
   }
 
   /**
@@ -96,7 +91,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_SwerveDrive.setBrake();
     m_robotContainer.m_Lift.setBrake();
     m_robotContainer.m_Arm.setBrake();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand(m_chooser.getSelected());
     
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
