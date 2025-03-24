@@ -34,12 +34,27 @@ public final class Constants {
     public static final double kLEFTLiftReef_L3 = 74.28549194335;
     public static final double kLEFTLiftAlgae = 50.85717391967;
     public static final double kLEFTLiftTop = 88.57318878173;
+    public static final double kLEFTLiftInit = 73;
+
+    // public static final double kLEFTLiftReef_L1 = 0;
+    // public static final double kLEFTLiftReef_L2 = 0;
+    // public static final double kLEFTLiftReef_L3 = 74.28549194335;
+    // public static final double kLEFTLiftAlgae = 50.85717391967;
+    // public static final double kLEFTLiftTop = 85.57318878173;
+    
 
     public static final double kRIGHTLiftReef_L1 = 0;
     public static final double kRIGHTLiftReef_L2 = 0;
     public static final double kRIGHTLiftReef_L3 = 74.04737472534;
     public static final double kRIGHTLiftAlgae = 50.54761886596;
-    public static final double kRIGHTLiftTop = 88.57318878173;    
+    public static final double kRIGHTLiftTop = 88.57318878173; 
+    public static final double kRIGHTLiftInit = 73;  
+
+    // public static final double kRIGHTLiftReef_L1 = 0;
+    // public static final double kRIGHTLiftReef_L2 = 0;
+    // public static final double kRIGHTLiftReef_L3 = 74.04737472534;
+    // public static final double kRIGHTLiftAlgae = 50.54761886596;
+    // public static final double kRIGHTLiftTop = 85.57318878173;   
   }
   public static class IntakeConstants {
     public static final int kIntakeMotorID = 15;
@@ -62,28 +77,34 @@ public final class Constants {
   public static class ArmConstants {
     public static final int kArmMotorID = 14;
     public static final double kArmEncoderOffset = 0.05;
-    public static final double kArmPower = 0.8;
+    public static final double kArmPower = 0.4;
 
     public static final double kArmOut = 3;
 
     public static final double kArmFloor = 1.1;
-    public static final double kArmHuman = 2.238913307189941+(Math.PI/2);
 
-    public static final double kArmReef_L1 = 3.589863929748-(Math.PI/2);
-    public static final double kArmReef_L2 = 3.838535308837-(Math.PI/2);
-    public static final double kArmReef_L3 = 3.740459442138-(Math.PI/2);
+    public static final double kArmHuman = 3.8097096339848378-0.194533;
+
+    public static final double kArmReef_L1 = 2.0190676029531036+0.074533;
+    public static final double kArmReef_L2 = 2.2677389820421032+0.224533;
+    public static final double kArmReef_L3 = 2.1696631153431034+0.174533+0.174533+0.174533;
+
+    // public static final double kArmReef_L1 = 3.8097096339848378+0.194533;
+    // public static final double kArmReef_L2 = 3.838535308837;
+    // public static final double kArmReef_L3 = 3.740459442138;
   }
   public static class CageConstants {
     public static final int kLeftCageMotorID = 12;
     public static final int kRightCageMotorID = 13;
     public static final double kCagePower = 0.1;
 
-    public static final double kCageEncoderOffset = 0.5;
+    public static final double kCageEncoderOffset = 0.1449451;
     public static final double kCageInit = 5.28;
     public static final double kCagePrepareToHang = 1.75;
     public static final double kCageHang =3.577;
-    public static final double kCageMaxHang = 5.28;
-    public static final double kCageMinHang = 1.26;
+
+    public static final double kCageMaxHang = 5.00;
+    public static final double kCageMinHang = 0.9473;
 
     
     public static final double kKaleb = 7;

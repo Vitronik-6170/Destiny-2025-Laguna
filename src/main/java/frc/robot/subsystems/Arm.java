@@ -43,7 +43,7 @@ public class Arm extends SubsystemBase {
     armConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
     armConfig.closedLoop.pid(1, 0, 0);
     armConfig.closedLoop.outputRange(-Constants.ArmConstants.kArmPower, Constants.ArmConstants.kArmPower);
-    armConfig.closedLoopRampRate(0.1);
+    armConfig.closedLoopRampRate(0.2);
 
     armMotor = new SparkMax(Constants.ArmConstants.kArmMotorID, MotorType.kBrushless);
     armEncoder = armMotor.getAbsoluteEncoder();
@@ -51,6 +51,7 @@ public class Arm extends SubsystemBase {
     armMotor.configure(armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
+  
   public void increasePosition(){
     if (positionIndex < POSITIONS.length - 1) {
       positionIndex++;
@@ -67,11 +68,15 @@ public class Arm extends SubsystemBase {
 
   public void adjustArmUp(){
     double position = getArmPosition();
-    armController.setReference(position+0.549066, ControlType.kPosition);
+    if(position > Math.PI){
+      armController.setReference(position-0.549066, ControlType.kPosition);
+    }else{
+      armController.setReference(position, ControlType.kPosition);
+    }
   }
   public void adjustArmDown(){
     double position = getArmPosition();
-    armController.setReference(position-0.349066, ControlType.kPosition);
+    armController.setReference(position+0.349066, ControlType.kPosition);
   }
 
   private void setPosition() {
@@ -108,7 +113,7 @@ public class Arm extends SubsystemBase {
   }
 
   public void armOut(){
-    armController.setReference(Constants.ArmConstants.kArmOut, ControlType.kPosition);
+    armController.setReference(Constants.ArmConstants.kArmHuman, ControlType.kPosition);
   }
   public void stop(){
     armController.setReference(getArmPosition(), ControlType.kPosition);

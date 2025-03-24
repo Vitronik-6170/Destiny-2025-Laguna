@@ -18,7 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -136,11 +135,11 @@ public class SwerveDrive extends SubsystemBase {
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
 
-    SmartDashboard.putNumber("Encoder frontLeft", m_frontLeft.getEncoder());
-    SmartDashboard.putNumber("Encoder frontRight", m_frontRight.getEncoder());
-    SmartDashboard.putNumber("Encoder rearLeft", m_rearLeft.getEncoder());
-    SmartDashboard.putNumber("Encoder rearRight", m_rearRight.getEncoder());
-    SmartDashboard.putNumber("NAVX", Navx);
+    // SmartDashboard.putNumber("Encoder frontLeft", m_frontLeft.getEncoder());
+    // SmartDashboard.putNumber("Encoder frontRight", m_frontRight.getEncoder());
+    // SmartDashboard.putNumber("Encoder rearLeft", m_rearLeft.getEncoder());
+    // SmartDashboard.putNumber("Encoder rearRight", m_rearRight.getEncoder());
+    // SmartDashboard.putNumber("NAVX", Navx);
   }
 
   /**

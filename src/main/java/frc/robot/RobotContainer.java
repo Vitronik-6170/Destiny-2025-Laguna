@@ -135,15 +135,36 @@ public class RobotContainer {
         new Pose2d(2.2, 0, new Rotation2d(0)),
         config);
 
+    Trajectory swerveToAlgae = TrajectoryGenerator.generateTrajectory(
+          // Start at the origin facing the +X direction
+          new Pose2d(2.2, 0, new Rotation2d(0)),
+          // Pass through these two interior waypoints, making an 's' curve path
+          //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+          List.of(new Translation2d(1, -1.5), new Translation2d(2,-1.5),new Translation2d(3,-1.5)),
+          // End 3 meters straight ahead of where we started, facing forward
+          new Pose2d(4, 0, new Rotation2d(0)),
+          config);
+
     Trajectory swerveToHuman = TrajectoryGenerator.generateTrajectory(
       // Start at the origin facing the +X direction
       new Pose2d(2.2, 0, new Rotation2d(0)),
       // Pass through these two interior waypoints, making an 's' curve path
       //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-      List.of(new Translation2d(1.5, -0.5)),
+      List.of(new Translation2d(1.5, -2)),
       // End 3 meters straight ahead of where we started, facing forward
       new Pose2d(4.5, -2, new Rotation2d(0)),
       config);
+
+      Trajectory swerveParo = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        //List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        List.of(new Translation2d(-1.5,0),new Translation2d(-1.5, 1)),
+        // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(3, 0, new Rotation2d(0)),
+        config);
+    
 
     var thetaController = new ProfiledPIDController(
         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
@@ -173,15 +194,38 @@ public class RobotContainer {
         m_SwerveDrive::setModuleStates,
         m_SwerveDrive);
 
+        SwerveControllerCommand swerveToAlgaeCommand = new SwerveControllerCommand(
+          swerveToAlgae,
+          m_SwerveDrive::getPose, // Functional interface to feed supplier
+          DriveConstants.kDriveKinematics,
+  
+          // Position controllers
+          new PIDController(AutoConstants.kPXController, 0, 0),
+          new PIDController(AutoConstants.kPYController, 0, 0),
+          thetaController,
+          m_SwerveDrive::setModuleStates,
+          m_SwerveDrive);
+          SwerveControllerCommand swerveToParoCommand = new SwerveControllerCommand(
+            swerveParo,
+            m_SwerveDrive::getPose, // Functional interface to feed supplier
+            DriveConstants.kDriveKinematics,
+    
+            // Position controllers
+            new PIDController(AutoConstants.kPXController, 0, 0),
+            new PIDController(AutoConstants.kPYController, 0, 0),
+            thetaController,
+            m_SwerveDrive::setModuleStates,
+            m_SwerveDrive);
+
     // Reset odometry to the starting pose of the trajectory.
     m_SwerveDrive.resetOdometry(swerveToL1.getInitialPose());
 
     Command elevatorUp = new ElevatorCommand(m_Lift, Constants.LiftConstants.kRIGHTLiftTop, Constants.LiftConstants.kLEFTLiftTop);
-    Command armL1 = new ArmCommand(m_Arm, Constants.ArmConstants.kArmReef_L1);
+    Command armL1 = new ArmCommand(m_Arm, Constants.ArmConstants.kArmHuman);
     Command elevatorDown = new ElevatorCommand(m_Lift, Constants.LiftConstants.kLiftFloor, Constants.LiftConstants.kLiftFloor);
     Command shootCoral = new IntakeCommand(m_Intake, -0.2, 1.5);
     Command wristL1 = new WristCommand(m_Wrist, Constants.WristConstants.kWristReeft_L1);
-    Command armHuman = new ArmCommand(m_Arm, Constants.ArmConstants.kArmHuman);
+    Command armHuman = new ArmCommand(m_Arm, Constants.ArmConstants.kArmReef_L1);
     Command wristHuman = new WristCommand(m_Wrist, Constants.WristConstants.horizontalWrist);
 
     // Run path following command, then stop at the end.
@@ -212,25 +256,25 @@ public class RobotContainer {
     );
     }else if(selection.equals("C")){
       return new SequentialCommandGroup(
+      swerveToL1Command,
       elevatorUp,
       armL1,
       wristL1,
       elevatorDown,
-      swerveToL1Command,
       new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
     );
+    }else if(selection.equals("D")){
+      return new SequentialCommandGroup(
+        elevatorUp,
+        armL1,
+        wristL1,
+        elevatorDown,
+        swerveToParoCommand,
+        armHuman,
+        new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
+      );
     }
-    return new SequentialCommandGroup(
-      elevatorUp,
-      armL1,
-      wristL1,
-      elevatorDown,
-      swerveToL1Command,
-      shootCoral,
-      armHuman,
-      wristHuman,
-      new InstantCommand(() -> m_SwerveDrive.drive(0, 0, 0, false))
-    );
+    return null;
     // new ParallelCommandGroup(
       //   new SequentialCommandGroup(
       //     elevatorUp,

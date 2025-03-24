@@ -15,6 +15,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -61,15 +62,21 @@ public class Cage extends SubsystemBase {
     right_cageController.setReference(Constants.CageConstants.kCageHang, ControlType.kPosition);
   }
   public void hanging() {
-    // if(right_cageAbsoluteEncoder.getPosition()>Constants.CageConstants.kCageInit){
-    //   right_cageMotor.set(0);
-    // }else{
-    //   right_cageMotor.set(Constants.CageConstants.kRight_PowerCageHang);
-    // }
-    right_cageMotor.set(Constants.CageConstants.kRight_PowerCageHang);
+    if(right_cageAbsoluteEncoder.getPosition()>Constants.CageConstants.kCageMaxHang){
+      right_cageMotor.set(0);
+    }else{
+      right_cageMotor.set(Constants.CageConstants.kRight_PowerCageHang);
+    }
+    //right_cageMotor.set(Constants.CageConstants.kRight_PowerCageHang);
   }
   public void desHanging() {
-    right_cageMotor.set(-Constants.CageConstants.kRight_PowerCageHang);
+    if(right_cageAbsoluteEncoder.getPosition()<Constants.CageConstants.kCageMinHang){
+      right_cageMotor.set(0);
+    }else{
+      right_cageMotor.set(-Constants.CageConstants.kRight_PowerCageHang);
+    }
+    //right_cageMotor.set(-Constants.CageConstants.kRight_PowerCageHang);
+    
   }
   public void initHang(){
     right_cageController.setReference(Constants.CageConstants.kCageInit, ControlType.kPosition);
@@ -77,6 +84,9 @@ public class Cage extends SubsystemBase {
   public void stopCage() {
     right_cageMotor.set(0);
     left_cageMotor.set(0);
+  }
+  public void printEn(){
+    SmartDashboard.putNumber("AAAA", right_cageAbsoluteEncoder.getPosition());
   }
   public double getAbsoluteEncoderCage(){
     return right_cageAbsoluteEncoder.getPosition();

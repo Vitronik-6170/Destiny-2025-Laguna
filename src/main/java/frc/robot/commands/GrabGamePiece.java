@@ -33,7 +33,7 @@ public class GrabGamePiece extends Command {
   public void execute() {
     double rightTrigger = RobotContainer.m_mechanismsController.getRightTriggerAxis();
     double leftTrgger = RobotContainer.m_mechanismsController.getLeftTriggerAxis();
-    double speed = rightTrigger - (leftTrgger*0.15);
+    double speed = rightTrigger - (leftTrgger*0.05);
     m_Intake.grabGamePiece(speed);
   }
 

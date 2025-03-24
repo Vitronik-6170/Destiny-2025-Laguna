@@ -124,25 +124,29 @@ public class Lift extends SubsystemBase {
     right_liftController.setReference(rightLevel, ControlType.kPosition);
   }
 
-  public double getAbsoluteEncoderR()  {
+  public double getRelativeEncoderR()  {
     return right_liftEncoder.getPosition();
   }
 
-  public double getAbsoluteEncoderL(){
+  public double getRelativeEncoderL(){
     return left_liftEncoder.getPosition();
   }
+  public void setInitLift(double liftRight, double liftLeft){
+    left_liftEncoder.setPosition(liftLeft);
+    right_liftEncoder.setPosition(liftRight);
+  }
   public void adjustLifterUp(){
-    left_liftController.setReference(getAbsoluteEncoderL()+1, ControlType.kPosition);
-    right_liftController.setReference(getAbsoluteEncoderR()+1, ControlType.kPosition);
+    left_liftController.setReference(getRelativeEncoderL()+1, ControlType.kPosition);
+    right_liftController.setReference(getRelativeEncoderR()+1, ControlType.kPosition);
   }
   public void adjustLifterDown(){
-    left_liftController.setReference(getAbsoluteEncoderL()-1, ControlType.kPosition);
-    right_liftController.setReference(getAbsoluteEncoderR()-1, ControlType.kPosition);
+    left_liftController.setReference(getRelativeEncoderL()-1, ControlType.kPosition);
+    right_liftController.setReference(getRelativeEncoderR()-1, ControlType.kPosition);
   }
 
   public void stop(){
-    left_liftController.setReference(getAbsoluteEncoderL(), ControlType.kPosition);
-    right_liftController.setReference(getAbsoluteEncoderR(), ControlType.kPosition);
+    left_liftController.setReference(getRelativeEncoderL(), ControlType.kPosition);
+    right_liftController.setReference(getRelativeEncoderR(), ControlType.kPosition);
   }
   public void setCoast(){
     left_liftConfig.idleMode(IdleMode.kCoast);

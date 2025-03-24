@@ -50,9 +50,10 @@ public class Robot extends TimedRobot {
 
     drive = new Drive(m_robotContainer.m_SwerveDrive);
     grabGamePiece = new GrabGamePiece(m_robotContainer.m_Intake);
+    m_chooser.setDefaultOption("L1", "B");
     m_chooser.addOption("L1 y Human", "A");
-    m_chooser.addOption("L1", "B");
     m_chooser.addOption("Salir", "C");
+    m_chooser.addOption("Sacar otro Pez", "D");
     SmartDashboard.putData(m_chooser);
   }
 
@@ -70,7 +71,11 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-  }
+
+    //SmartDashboard.putNumber("Lift L", m_robotContainer.m_Lift.getRelativeEncoderL());
+    //SmartDashboard.putNumber("Lift R", m_robotContainer.m_Lift.getRelativeEncoderR());  
+    
+  } 
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
@@ -91,6 +96,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_SwerveDrive.setBrake();
     m_robotContainer.m_Lift.setBrake();
     m_robotContainer.m_Arm.setBrake();
+    //m_robotContainer.m_Lift.setInitLift(Constants.LiftConstants.kRIGHTLiftInit, Constants.LiftConstants.kLEFTLiftInit);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand(m_chooser.getSelected());
     
     // schedule the autonomous command (example)
@@ -117,7 +123,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_SwerveDrive.setBrake();
     m_robotContainer.m_Lift.setBrake();
     m_robotContainer.m_Arm.setBrake();
-    m_robotContainer.m_Arm.armOut();
+    //m_robotContainer.m_Arm.armOut();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -133,7 +139,12 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //SmartDashboard.putNumber("BRAZO", m_robotContainer.m_Arm.getArmPosition());
+    m_robotContainer.m_Cage.printEn();
+
+   
+    
+    SmartDashboard.putNumber("BRAZO", m_robotContainer.m_Arm.getArmPosition());
+    SmartDashboard.putNumber("CAGE", m_robotContainer.m_Cage.getAbsoluteEncoderCage());
   }
 
   @Override

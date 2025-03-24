@@ -47,7 +47,7 @@ public class ElevatorCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(m_Lift.getAbsoluteEncoderL()-targetLevel_L) < 1 || 
-            Math.abs(m_Lift.getAbsoluteEncoderR()-targetLevel_R) < 1;
+    return Math.abs(m_Lift.getRelativeEncoderL()-targetLevel_L) < 1 || 
+            Math.abs(m_Lift.getRelativeEncoderR()-targetLevel_R) < 1;
   }
 }
